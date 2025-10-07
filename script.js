@@ -96,6 +96,8 @@ class Segment {
 }
 
 /* ============== Ciempiés ============== */
+let flash = 0; // Nueva variable global
+
 class Centipede {
   constructor({
     segments = 30,
@@ -165,24 +167,30 @@ class Centipede {
       const dy = f.y - head.y;
       const dist = Math.hypot(dx, dy);
       if (dist <= rHead + f.r) {
-        // Comer
         foods.splice(i, 1);
-        // Crecer
         const tail = this.parts[this.parts.length - 1];
         const newSeg = new Segment(tail, this.segLen, Math.max(this.baseR * 0.55, tail.r * 0.98));
         newSeg.x = tail.x; newSeg.y = tail.y; newSeg.a = tail.a;
         this.parts.push(newSeg);
-        // Reponer comida
         ensureFoods();
+        flash = 1; // Activa el destello
         break;
       }
     }
   }
 
   draw() {
-    ctx.fillStyle = "rgba(0,0,0,0.22)";
-    ctx.fillRect(0, 0, innerWidth, innerHeight);
-    
+    // Fondo con destello
+    if (flash > 0) {
+      ctx.fillStyle = `rgba(255,255,255,${flash})`;
+      ctx.fillRect(0, 0, innerWidth, innerHeight);
+      flash -= 0.08; // Disminuye el destello
+      if (flash < 0) flash = 0;
+    } else {
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
+      ctx.fillRect(0, 0, innerWidth, innerHeight);
+    }
+
         // --- Dibujar comida (ADD) ---
     ensureFoods();
     for (const f of foods) f.draw();
